@@ -1,2 +1,2 @@
 # Code-for-Ensembl-to-Gene-name
-This R code convert gene names to ensembl ids
+This R code converts gene names to ensembl ids
