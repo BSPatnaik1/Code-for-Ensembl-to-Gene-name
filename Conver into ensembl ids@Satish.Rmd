@@ -1,0 +1,86 @@
+---
+title: "Convert gene names into ensembl ids"
+author: "Satish Patnaik Baggam"
+date: "2024-09-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+#Conver gene names into ensembl IDs
+
+# Install packages if needed
+if (!requireNamespace("biomaRt", quietly = TRUE)) {
+  install.packages("BiocManager")
+  BiocManager::install("biomaRt")
+}
+
+# Load necessary libraries
+library(biomaRt)
+library(dplyr)
+library(readr)
+
+# Load the input file with human gene names
+gene_names <- read.csv("TARGETGENES.csv", header = TRUE)
+
+# Print the first few rows of the input data to verify
+print("Input Gene Names:")
+print(head(gene_names))
+
+# Check the column names in the input data
+print("Column Names in the Input File:")
+print(colnames(gene_names))
+
+# Replace 'external_gene_name' with the actual column name containing gene names
+# For example, if the column is named 'GeneName', replace 'external_gene_name' with 'GeneName'
+actual_column_name <- colnames(gene_names)[1]  # Assume the gene names are in the first column
+
+# Use biomaRt to connect to the Ensembl database
+mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+
+# Retrieve Ensembl IDs for the given gene names
+gene_info <- getBM(
+  attributes = c('external_gene_name', 'ensembl_gene_id'),
+  filters = 'external_gene_name',
+  values = gene_names[[actual_column_name]],  # Use the correct column name
+  mart = mart
+)
+
+# Print the first few rows of the retrieved data to verify
+print("Retrieved Gene Information:")
+print(head(gene_info))
+
+# Save the output to TARGETGENES2.csv
+write.csv(gene_info, "TARGETGENES.csv", row.names = FALSE)
+
+# Confirmation message
+print("Conversion complete. Output saved to TARGETGENES.csv")
+```
+
+
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
